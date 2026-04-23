@@ -131,27 +131,27 @@
 
         }
 
-        function viewBooks(){
+        function viewBook(){
             $con =$this->opencon();
             return $con->query("SELECT * from books")->fetchAll();
         }
 
-        function viewBookies()
-        {
-            $con = $this->opencon();
-            return $con->query("SELECT
-            Books.book_id,
-            Books.book_title,
-            Books.book_isbn,
-            Books.book_publication_year,
-            Books.book_publisher,
+        function viewBooks()
+{
+    $con = $this->opencon();
+    return $con->query("SELECT
+            books.book_id,
+            books.book_title,
+            books.book_isbn,
+            books.book_publication_year,
+            books.book_publisher,
             COUNT(book_copy.copy_id) AS Copies,
-            SUM(book_copy.bc_status = 'AVAILABLE') AS Available_Copies
-            FROM
+            COALESCE(SUM(book_copy.bc_status = 'AVAILABLE'), 0) AS Available_Copies
+        FROM
             books
-            JOIN book_copy ON books.book_id = book_copy.book_id
-            GROUP BY 1")->fetchAll();
-        }
+        LEFT JOIN book_copy ON books.book_id = book_copy.book_id
+        GROUP BY books.book_id")->fetchAll();
+}
         
         function insertBookAuthor($book_id, $author_id){
             $con = $this->opencon();
@@ -210,7 +210,7 @@
         $con->beginTransaction();
  
         $stmt = $con->prepare("
-            UPDATE Books
+            UPDATE books
             SET book_title = ?,
                 book_isbn = ?,
                 book_publication_year = ?,

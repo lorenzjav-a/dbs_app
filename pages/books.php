@@ -2,8 +2,8 @@
 require_once('../classes/database.php');
 $con = new database();
 
+$allbook = $con->viewBook();
 $allbooks = $con->viewBooks();
-$allbookies = $con->viewBookies();
 $allauthors = $con->viewAuthors();
 $allgenres = $con->viewGenres();
 
@@ -235,7 +235,7 @@ $bookUpdateMessage = '';
             <select class="form-select" name="book_id" required>
             <option value="">Select Book</option>
             <?php
-                  foreach($allbooks as $books){
+                  foreach($allbook as $books){
                  echo '<option value="'.$books['book_id'].'">'.$books['book_title'].'</option>';
                   }
                   ?>
@@ -286,25 +286,25 @@ $bookUpdateMessage = '';
             <tbody>
 
               <?php
-                    foreach($allbookies as $bookie){
+                    foreach($allbooks as $book){
             echo'<tr>';
-            echo'<td>'.$bookie['book_id'].'</td>';
-            echo'<td>'.$bookie['book_title'].'</td>';
-            echo'<td>'.$bookie['book_isbn'].'</td>';
-            echo'<td>'.$bookie['book_publication_year'].'</td>';
-            echo'<td>'.$bookie['book_publisher'].'</td>';
-            echo'<td class="text-center">'.$bookie['Copies'].'</td>';
-            echo'<td class="text-center"><span class="badge bg-success">'.$bookie['Available_Copies'].'</span></td>';
+            echo'<td>'.$book['book_id'].'</td>';
+            echo'<td>'.$book['book_title'].'</td>';
+            echo'<td>'.$book['book_isbn'].'</td>';
+            echo'<td>'.$book['book_publication_year'].'</td>';
+            echo'<td>'.$book['book_publisher'].'</td>';
+            echo'<td class="text-center">'.$book['Copies'].'</td>';
+            echo'<td class="text-center"><span class="badge bg-success">'.$book['Available_Copies'].'</span></td>';
             echo'<td class="text-end">';
             echo'<div class="btn-group" role="group">';
 
             echo'<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBookModal"
 
-            data-book-id="'.$bookie['book_id'].'"
-            data-book-title="'.$bookie['book_title'].'"
-            data-book-isbn="'.$bookie['book_isbn'].'"
-            data-book-year="'.$bookie['book_publication_year'].'"
-            data-book-publisher="'.$bookie['book_publisher'].'"
+            data-book-id="'.$book['book_id'].'"
+            data-book-title="'.$book['book_title'].'"
+            data-book-isbn="'.$book['book_isbn'].'"
+            data-book-year="'.$book['book_publication_year'].'"
+            data-book-publisher="'.$book['book_publisher'].'"
 
 
             >Edit</button>';
@@ -316,11 +316,10 @@ $bookUpdateMessage = '';
 
 
         }?>
-            <div class="btn-group" role="group" aria-label="Basic Mixed Styles Example">
+            <div class="btn-group" role="group" aria-label="Basic Mixed Styles Example"></div>
 
             </tbody>
           </table>
-          </div>
         </div>
 
         <hr class="my-4">
@@ -336,7 +335,7 @@ $bookUpdateMessage = '';
                   <select class="form-select" name="book_id" required>
                     <option value="">Select book</option>
                     <?php
-                  foreach($allbooks as $books){
+                  foreach($allbook as $books){
                  echo '<option value="'.$books['book_id'].'">'.$books['book_title'].'</option>';
                   }
                   ?>
@@ -371,7 +370,7 @@ $bookUpdateMessage = '';
                   <select class="form-select" name="book_id" required>
                     <option value="">Select book</option>
                     <?php
-                  foreach($allbooks as $books){
+                  foreach($allbook as $books){
                  echo '<option value="'.$books['book_id'].'">'.$books['book_title'].'</option>';
                   }
                   ?>
@@ -412,7 +411,7 @@ $bookUpdateMessage = '';
       <div class="modal-body">
         <!-- Later in PHP: load existing values -->
         <form action="#" method="POST">
-          <input type="hidden" name="book_id" id="edit_book_id">
+          <input type="hidden" name="book_id" id="ebook_id">
           <div class="mb-3">
             <label class="form-label">Book ID</label>
             <input class="form-control" name="book_id" id="edit_book_id" readonly>
@@ -450,9 +449,13 @@ $bookUpdateMessage = '';
     if(!button) return;
 
     document.getElementById('edit_book_id').value = button.getAttribute('data-book-id') || '';
+
     document.getElementById('edit_book_title').value = button.getAttribute('data-book-title') || '';
+
     document.getElementById('edit_book_isbn').value = button.getAttribute('data-book-isbn') || '';
+
     document.getElementById('edit_book_year').value = button.getAttribute('data-book-year') || '';
+    
     document.getElementById('edit_book_publisher').value = button.getAttribute('data-book-publisher') || '';
 
   });
