@@ -201,6 +201,34 @@
             $con =$this->opencon();
             return $con->query("SELECT * from genre")->fetchAll();
         }
+        
+        function updateBook($book_id, $book_title, $book_isbn, $book_publication_year, $book_publisher) {
+    $con = $this->opencon();
+ 
+    try {
+        $con->beginTransaction();
+ 
+        $stmt = $con->prepare("
+            UPDATE Books
+            SET book_title = ?,
+                book_isbn = ?,
+                book_publication_year = ?,
+                book_publisher = ?
+            WHERE book_id = ?
+        ");
+ 
+        $stmt->execute([$book_title, $book_isbn, $book_publication_year, $book_publisher, $book_id]);
+ 
+        $con->commit();
+        return true; 
+
+ } catch (PDOException $e) {
+        if ($con->inTransaction()) {
+            $con->rollBack();
+        }
+        throw $e;
+    }
+        }
 
     }
 

@@ -365,19 +365,28 @@ $bookGenreCreateMessage = '';
       <div class="modal-body">
         <!-- Later in PHP: load existing values -->
         <form action="#" method="POST">
+          <input type="hidden" name="book_id" id="edit_book_id">
+          <div class="mb-3">
+            <label class="form-label">Book ID</label>
+            <input class="form-control" name="book_id" id="edit_book_id" value="1" readonly>
+          </div>
           <div class="mb-3">
             <label class="form-label">Title</label>
-            <input class="form-control" value="Noli Me Tangere">
+            <input class="form-control" name="book_title" id="edit_book_title">
           </div>
           <div class="mb-3">
             <label class="form-label">ISBN</label>
-            <input class="form-control" value="9789710810736">
+            <input class="form-control" name="book_isbn" id="edit_book_isbn">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Publication Year</label>
+            <input class="form-control" type="number" min="1500" max="2100" name="book_publication_year" id="edit_book_year">
           </div>
           <div class="mb-3">
             <label class="form-label">Publisher</label>
-            <input class="form-control" value="National Book Store">
+            <input class="form-control" name="book_publisher" id="edit_book_publisher">
           </div>
-          <button class="btn btn-primary w-100" type="button">Save Changes</button>
+          <button class="btn btn-primary w-100" type="submit">Save Changes</button>
         </form>
       </div>
     </div>
@@ -386,6 +395,21 @@ $bookGenreCreateMessage = '';
 
 <script src="../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 <script src="../sweetalert/dist/sweetalert2.js"></script>
+
+<script>
+  const editBookModal = document.getElementById('editBookModal');
+  editBookModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    if(!button) return;
+
+    document.getElementById('edit_book_id').value = button.getAttribute('data-book-id') || '';
+    document.getElementById('edit_book_title').value = button.getAttribute('data-book-title') || '';
+    document.getElementById('edit_book_isbn').value = button.getAttribute('data-book-isbn') || '';
+    document.getElementById('edit_book_year').value = button.getAttribute('data-book-year') || '';
+    document.getElementById('edit_book_publisher').value = button.getAttribute('data-book-publisher') || '';
+    
+  });
+</script>
 
 
 <script>
