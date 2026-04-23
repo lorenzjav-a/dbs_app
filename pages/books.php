@@ -3,6 +3,7 @@ require_once('../classes/database.php');
 $con = new database();
 
 $allbooks = $con->viewBooks();
+$allbookies = $con->viewBookies();
 $allauthors = $con->viewAuthors();
 $allgenres = $con->viewGenres();
 
@@ -121,6 +122,37 @@ $bookGenreCreateMessage = '';
 
 }
 
+$bookUpdateStatus = null;
+$bookUpdateMessage = '';
+
+
+  if(isset($_POST['update_book'])){
+    
+    // 1. validations
+    $book_id = $_POST['book_id'];
+    $book_title = $_POST['book_title'];
+    $book_isbn = $_POST['book_isbn'];
+    $book_publication_year = $_POST['book_publication_year'];
+    $book_publisher = $_POST['book_publisher'];
+
+    try {
+
+    // 4. insert into borrowers' table and get a new borrower_id
+    $con->updateBook($book_id, $book_title, $book_isbn, $book_publication_year, $book_publisher);
+
+    $bookUpdateStatus = 'success';
+    $bookUpdateMessage = 'Book updated successfully.';
+
+
+    } catch (Exception $e){
+
+      $bookUpdateStatus = 'error';
+      $bookUpdateMessage = $e->getMessage();
+
+    }
+
+}
+
 
 
 
@@ -145,8 +177,8 @@ $bookGenreCreateMessage = '';
     </button>
     <div id="navBooks" class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto gap-lg-1">
-        <li class="nav-item"><a class="nav-link" href="admin-dashboard.html">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link active" href="books.html">Books</a></li>
+        <li class="nav-item"><a class="nav-link" href="admin-dashboard.php">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link active" href="books.php">Books</a></li>
         <li class="nav-item"><a class="nav-link" href="borrowers.php">Borrowers</a></li>
         <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
         <li class="nav-item"><a class="nav-link" href="return.html">Return</a></li>
@@ -254,26 +286,41 @@ $bookGenreCreateMessage = '';
             <tbody>
 
               <?php
-              $viewCopies = $con->viewCopies();
-                    foreach($viewCopies as $view){
+                    foreach($allbookies as $bookie){
             echo'<tr>';
-            echo'<td>'.$view['book_id'].'</td>';
-            echo'<td>'.$view['book_title'].'</td>';
-            echo'<td>'.$view['book_isbn'].'</td>';
-            echo'<td>'.$view['book_publication_year'].'</td>';
-            echo'<td>'.$view['book_publisher'].'</td>';
-            echo'<td>'.$view['Copies'].'</td>';
-            echo'<td>'.$view['Available_Copies'].'</td>';
+            echo'<td>'.$bookie['book_id'].'</td>';
+            echo'<td>'.$bookie['book_title'].'</td>';
+            echo'<td>'.$bookie['book_isbn'].'</td>';
+            echo'<td>'.$bookie['book_publication_year'].'</td>';
+            echo'<td>'.$bookie['book_publisher'].'</td>';
+            echo'<td class="text-center">'.$bookie['Copies'].'</td>';
+            echo'<td class="text-center"><span class="badge bg-success">'.$bookie['Available_Copies'].'</span></td>';
             echo'<td class="text-end">';
-            echo'<button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBookModal">Edit</button>';
+            echo'<div class="btn-group" role="group">';
+
+            echo'<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBookModal"
+
+            data-book-id="'.$bookie['book_id'].'"
+            data-book-title="'.$bookie['book_title'].'"
+            data-book-isbn="'.$bookie['book_isbn'].'"
+            data-book-year="'.$bookie['book_publication_year'].'"
+            data-book-publisher="'.$bookie['book_publisher'].'"
+
+
+            >Edit</button>';
+
             echo'<button class="btn btn-sm btn-outline-danger">Delete</button>';
+            echo'</div>';
             echo'</td>';
             echo'</tr>';
-        }
-              ?>
+
+
+        }?>
+            <div class="btn-group" role="group" aria-label="Basic Mixed Styles Example">
 
             </tbody>
           </table>
+          </div>
         </div>
 
         <hr class="my-4">
@@ -356,7 +403,7 @@ $bookGenreCreateMessage = '';
 
 <!-- Edit Book Modal (UI only) -->
 <div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog"> 
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Edit Book</h5>
@@ -368,7 +415,7 @@ $bookGenreCreateMessage = '';
           <input type="hidden" name="book_id" id="edit_book_id">
           <div class="mb-3">
             <label class="form-label">Book ID</label>
-            <input class="form-control" name="book_id" id="edit_book_id" value="1" readonly>
+            <input class="form-control" name="book_id" id="edit_book_id" readonly>
           </div>
           <div class="mb-3">
             <label class="form-label">Title</label>
@@ -386,7 +433,7 @@ $bookGenreCreateMessage = '';
             <label class="form-label">Publisher</label>
             <input class="form-control" name="book_publisher" id="edit_book_publisher">
           </div>
-          <button class="btn btn-primary w-100" type="submit">Save Changes</button>
+          <button name="update_book" class="btn btn-primary w-100" type="submit">Save Changes</button>
         </form>
       </div>
     </div>
@@ -407,7 +454,7 @@ $bookGenreCreateMessage = '';
     document.getElementById('edit_book_isbn').value = button.getAttribute('data-book-isbn') || '';
     document.getElementById('edit_book_year').value = button.getAttribute('data-book-year') || '';
     document.getElementById('edit_book_publisher').value = button.getAttribute('data-book-publisher') || '';
-    
+
   });
 </script>
 
@@ -517,6 +564,35 @@ $bookGenreCreateMessage = '';
   title: "Success",
   icon: "success",
   text: GenrecreateMessage,
+  confirmButtonText: "OK",
+  	});
+  
+  }
+
+
+
+
+
+</script>
+
+<script>
+
+  const BookUpdateStatus = <?php echo json_encode($bookUpdateStatus)?>;
+  const BookUpdateMessage = <?php echo json_encode($bookUpdateMessage)?>;
+
+  if(BookUpdateStatus == 'success'){
+  Swal.fire({
+  title: "Success",
+  icon: "success",
+  text: BookUpdateMessage,
+  confirmButtonText: "OK",
+  	});
+
+   } else if(BookUpdateStatus == 'success'){
+  Swal.fire({
+  title: "Success",
+  icon: "success",
+  text: BookUpdateMessage,
   confirmButtonText: "OK",
   	});
   

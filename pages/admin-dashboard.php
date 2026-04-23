@@ -12,14 +12,14 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-semibold" href="admin-dashboard.html">Library Admin</a>
+    <a class="navbar-brand fw-semibold" href="admin-dashboard.php">Library Admin</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navAdmin">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div id="navAdmin" class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto gap-lg-1">
-        <li class="nav-item"><a class="nav-link active" href="admin-dashboard.html">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="books.html">Books</a></li>
+        <li class="nav-item"><a class="nav-link active" href="admin-dashboard.php">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="books.php">Books</a></li>
         <li class="nav-item"><a class="nav-link" href="borrowers.php">Borrowers</a></li>
         <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
         <li class="nav-item"><a class="nav-link" href="return.html">Return</a></li>
@@ -45,25 +45,45 @@
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Total Books</div>
-              <div class="fs-4 fw-semibold">5</div>
+              <?php
+              require_once('../classes/database.php');
+              $con = new database();
+              $bookcount = $con->countBooks();
+              ?>
+              <div class="fs-4 fw-semibold"><?php echo $bookcount; ?></div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Total Copies</div>
-              <div class="fs-4 fw-semibold">11</div>
+              <?php
+              require_once('../classes/database.php');
+              $con = new database();
+              $copycount = $con->countCopies();
+              ?>
+              <div class="fs-4 fw-semibold"><?php echo $copycount; ?></div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Open Loans</div>
-              <div class="fs-4 fw-semibold">2</div>
+              <?php
+              require_once('../classes/database.php');
+              $con = new database();
+              $loancount = $con->countLoans();
+              ?>
+              <div class="fs-4 fw-semibold"><?php echo $loancount; ?></div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Overdue Items</div>
-              <div class="fs-4 fw-semibold">0</div>
+              <?php
+              require_once('../classes/database.php');
+              $con = new database();
+              $overduecount = $con->countOverdueItems();
+              ?>
+              <div class="fs-4 fw-semibold"><?php echo $overduecount; ?></div>
             </div>
           </div>
         </div>

@@ -136,20 +136,21 @@
             return $con->query("SELECT * from books")->fetchAll();
         }
 
-        function viewCopies(){
-            $con =$this->opencon();
+        function viewBookies()
+        {
+            $con = $this->opencon();
             return $con->query("SELECT
-    books.book_id,
-    books.book_title,
-    books.book_isbn,
-    books.book_publication_year,
-    books.book_edition,
-    books.book_publisher,
-    COUNT(book_copy.copy_id)AS Copies,
-    SUM(book_copy.bc_status ='Available') AS Available_Copies
-    FROM books
-    JOIN book_copy ON book_copy.copy_id
-    GROUP BY 1")->fetchAll();
+            Books.book_id,
+            Books.book_title,
+            Books.book_isbn,
+            Books.book_publication_year,
+            Books.book_publisher,
+            COUNT(book_copy.copy_id) AS Copies,
+            SUM(book_copy.bc_status = 'AVAILABLE') AS Available_Copies
+            FROM
+            books
+            JOIN book_copy ON books.book_id = book_copy.book_id
+            GROUP BY 1")->fetchAll();
         }
         
         function insertBookAuthor($book_id, $author_id){
@@ -230,7 +231,26 @@
     }
         }
 
-    }
+        function countBooks(){
+            $con = $this->opencon();
+            return $con->query("SELECT COUNT(*) AS total_books FROM books")->fetch(PDO::FETCH_ASSOC)['total_books'];
+        }
 
+        function countCopies(){
+            $con = $this->opencon();
+            return $con->query("SELECT COUNT(*) AS total_copies FROM book_copy")->fetch(PDO::FETCH_ASSOC)['total_copies'];
+        }
+
+        function countLoans(){
+            $con = $this->opencon();
+            return $con->query("SELECT COUNT(*) AS total_loans FROM loan")->fetch(PDO::FETCH_ASSOC)['total_loans'];
+        }
+
+        function countOverdueItems(){
+            $con = $this->opencon();
+            return $con->query("SELECT COUNT(*) AS total_overdue FROM loan_item WHERE li_duedate < CURDATE() AND li_returned_at IS NULL")->fetch(PDO::FETCH_ASSOC)['total_overdue'];
+        }
+
+     }
 
 ?>
