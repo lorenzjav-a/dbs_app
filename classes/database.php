@@ -136,8 +136,7 @@
             return $con->query("SELECT * from books")->fetchAll();
         }
 
-        function viewBooks()
-{
+        function viewBooks(){
     $con = $this->opencon();
     return $con->query("SELECT
             books.book_id,
@@ -160,7 +159,7 @@
                 $con->beginTransaction();
                 $stmt = $con->prepare('INSERT INTO book_authors (book_id, author_id) VALUES (?, ?)');
                 $stmt->execute([$book_id, $author_id]);
-                $copy_id = $con->lastInsertId();
+                $ba_id = $con->lastInsertId();
                 $con->commit();
 
                 return true;
@@ -185,7 +184,7 @@
                 $con->beginTransaction();
                 $stmt = $con->prepare('INSERT INTO book_genre (book_id, genre_id) VALUES (?, ?)');
                 $stmt->execute([$book_id, $genre_id]);
-                $copy_id = $con->lastInsertId();
+                $gb_id = $con->lastInsertId();
                 $con->commit();
 
                 return true;
@@ -251,6 +250,74 @@
             return $con->query("SELECT COUNT(*) AS total_overdue FROM loan_item WHERE li_duedate < CURDATE() AND li_returned_at IS NULL")->fetch(PDO::FETCH_ASSOC)['total_overdue'];
         }
 
-     }
+        function viewLoans(){
+            $con = $this->opencon();
+    return $con->query("SELECT
+            loan.loan_id,
+            CONCAT(borrowers.borrower_firstname, ' ', borrowers.borrower_lastname) AS borrower_name,
+            loan.loan_date,
+            loan.loan_status,
+            users.username
+        FROM
+            loan
+        JOIN borrowers ON loan.borrower_id = borrowers.borrower_id
+        JOIN users ON loan.user_id = users.user_id
+        GROUP BY loan.loan_id")->fetchAll();
+        }
+
+        function insertAuthor($author_firstname, $author_lastname, $author_birth_year, $author_nationality){
+            $con = $this->opencon();
+
+            try{
+                $con->beginTransaction();
+                $stmt = $con->prepare('INSERT INTO author (author_firstname, author_lastname, author_birth_year, author_nationality ) VALUES (?, ?, ?, ?)');
+                $stmt->execute([$author_firstname, $author_lastname, $author_birth_year, $author_nationality]);
+                $author_id = $con->lastInsertId();
+                $con->commit();
+
+                return $author_id;
+
+            }catch(PDOException $e){
+                if($con->inTransaction()){
+                    $con->rollBack();
+                }
+            }
+
+        }
+
+        function insertGenre($genre_name){
+            $con = $this->opencon();
+
+            try{
+                $con->beginTransaction();
+                $stmt = $con->prepare('INSERT INTO genre (genre_name) VALUES (?)');
+                $stmt->execute([$genre_name]);
+                $genre_id = $con->lastInsertId();
+                $con->commit();
+
+                return $genre_id;
+
+            }catch(PDOException $e){
+                if($con->inTransaction()){
+                    $con->rollBack();
+                }
+            }
+
+        }
+
+        public function genreExists($genre) {
+            $con = $this->opencon();
+
+            try {
+    
+                $query = $con->prepare("SELECT COUNT(*) FROM genre WHERE genre_name = ?");
+                $query->execute([$genre]);
+                return $query->fetchColumn() > 0;
+    
+            } catch (PDOException $e) {
+                return false; 
+        }
+    } 
+}
 
 ?>

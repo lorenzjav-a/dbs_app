@@ -1,3 +1,23 @@
+<?php
+require_once('../classes/database.php');
+$con = new database();
+
+
+$bookcount = $con->countBooks();
+$copycount = $con->countCopies();
+$loancount = $con->countLoans();
+$overduecount = $con->countOverdueItems();
+$allLoans = $con->viewLoans();
+
+
+
+
+
+
+
+
+
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,6 +41,7 @@
         <li class="nav-item"><a class="nav-link active" href="admin-dashboard.php">Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" href="books.php">Books</a></li>
         <li class="nav-item"><a class="nav-link" href="borrowers.php">Borrowers</a></li>
+        <li class="nav-item"><a class="nav-link active" href="authors-genres.php">Authors &amp; Genres</a></li>
         <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
         <li class="nav-item"><a class="nav-link" href="return.html">Return</a></li>
         <li class="nav-item"><a class="nav-link" href="catalog.html">Catalog</a></li>
@@ -45,44 +66,26 @@
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Total Books</div>
-              <?php
-              require_once('../classes/database.php');
-              $con = new database();
-              $bookcount = $con->countBooks();
-              ?>
+
               <div class="fs-4 fw-semibold"><?php echo $bookcount; ?></div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Total Copies</div>
-              <?php
-              require_once('../classes/database.php');
-              $con = new database();
-              $copycount = $con->countCopies();
-              ?>
               <div class="fs-4 fw-semibold"><?php echo $copycount; ?></div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Open Loans</div>
-              <?php
-              require_once('../classes/database.php');
-              $con = new database();
-              $loancount = $con->countLoans();
-              ?>
               <div class="fs-4 fw-semibold"><?php echo $loancount; ?></div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="border rounded p-3 bg-white">
               <div class="small-muted">Overdue Items</div>
-              <?php
-              require_once('../classes/database.php');
-              $con = new database();
-              $overduecount = $con->countOverdueItems();
-              ?>
+              
               <div class="fs-4 fw-semibold"><?php echo $overduecount; ?></div>
             </div>
           </div>
@@ -103,32 +106,45 @@
               </tr>
             </thead>
             <tbody>
+              <?php foreach ($allLoans as $loan) {
+                
+                 if ($loan['loan_status'] == 'OPEN') {
+                  $class = 'text-bg-warning';
+                } else {
+                  $class = 'text-bg-success';
+                }
+                ?>
+               
               <tr>
-                <td>1004</td>
-                <td>Ana Bautista</td>
-                <td><span class="badge text-bg-warning">OPEN</span></td>
-                <td>2026-02-15</td>
-                <td>admin.library@samplemail.com</td>
+                <td><?php echo $loan['loan_id'] ?></td>
+                <td><?php echo $loan['borrower_name'] ?></td>
+              
+ 
+                <td><span class="badge <?php echo $class; ?>"><?php echo $loan['loan_status'] ?></span></td>
+ 
+                <td><?php echo $loan['loan_date'] ?></td>
+                
+                <td><?php echo $loan['username'] ?></td>
               </tr>
-              <tr>
-                <td>1003</td>
-                <td>Mark Reyes</td>
-                <td><span class="badge text-bg-warning">OPEN</span></td>
-                <td>2026-01-10</td>
-                <td>admin.library@samplemail.com</td>
-              </tr>
-              <tr>
+ 
+            <?php } ?>
+              
+              <!-- <tr>
                 <td>1002</td>
                 <td>Maria Santos</td>
                 <td><span class="badge text-bg-success">CLOSED</span></td>
                 <td>2025-12-12</td>
                 <td>admin.library@samplemail.com</td>
-              </tr>
+              </tr> -->
+             
+ 
+ 
+              
             </tbody>
           </table>
         </div>
 
-      </div>
+      
     </div>
 
     <div class="col-12 col-lg-4">
