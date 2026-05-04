@@ -1,11 +1,14 @@
 <?php
 require_once('../classes/database.php');
+session_start();
+
 $con = new database();
 
 $allbook = $con->viewBook();
 $allbooks = $con->viewBooks();
 $allauthors = $con->viewAuthors();
 $allgenres = $con->viewGenres();
+
 
 $bookCreateStatus = null;
 $bookCreateMessage = '';
@@ -153,6 +156,25 @@ $bookUpdateMessage = '';
 
 }
 
+     if(isset($_POST['delete_book'])){
+    $book_id = $_POST['book_id'];
+    $book_title = $_POST['book_title'];
+    $_SESSION['book_title'] = $book_title;
+
+    try {
+
+    $con->deleteBook($book_id);
+    $_SESSION['success_message'] = $book_title . ' has been deleted in the database. ';
+    header('Location: books.php');
+    exit();
+    
+    } catch (Exception $e){
+
+    $error_message = "Cannot delete this book. It may have active loans or active copies in use";
+      
+    }
+
+}
 
 
 
@@ -194,6 +216,29 @@ $bookUpdateMessage = '';
 </nav>
 
 <main class="container py-4">
+
+
+<?php if(isset($_SESSION['success_message'])){ ?>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Success!</strong> <?php echo $_SESSION['success_message']; ?>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+   
+  </button>
+</div>
+<?php 
+ unset($_SESSION['success_message']);
+} ?>
+
+<?php if(isset($error_message)){ ?>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error</strong> <?php echo $error_message; ?>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+   
+  </button>
+</div>
+<?php } ?>
+
+
   <div class="row g-3">
     <div class="col-12 col-lg-4">
       <div class="card p-4">
@@ -299,8 +344,7 @@ $bookUpdateMessage = '';
             echo'<td class="text-end">';
             echo'<div class="btn-group" role="group">';
 
-            echo'<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBookModal"
-
+            echo'<button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editBookModal"
             data-book-id="'.$book['book_id'].'"
             data-book-title="'.$book['book_title'].'"
             data-book-isbn="'.$book['book_isbn'].'"
@@ -310,14 +354,14 @@ $bookUpdateMessage = '';
 
             >Edit</button>';
 
-            echo'<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deleteBookModal"
+            echo'<button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBookModal"
 
             data-book-id="'.$book['book_id'].'"
             data-book-title="'.$book['book_title'].'"
 
             >Delete</button>';
 
-            echo'<button class="btn btn-sm btn-outline-danger">Delete</button>';
+           
             echo'</div>';
             echo'</td>';
             echo'</tr>';
@@ -409,40 +453,27 @@ $bookUpdateMessage = '';
 </main>
 
 <!-- Edit Book Modal (UI only) -->
-<div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="deleteBookModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog"> 
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Book</h5>
+        <h5 class="modal-title">Delete Book</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <!-- Later in PHP: load existing values -->
+
+
+        <p> Are you sure you want to delete <strong id="delete_book_title"></strong>?</p>
+        <p class="text-danger small"> this action cannot be undone.</p>
+
         <form action="#" method="POST">
-          <input type="hidden" name="book_id" id="ebook_id">
-          <div class="mb-3">
-            <label class="form-label">Book ID</label>
-            <input class="form-control" name="book_id" id="edit_book_id" readonly>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Title</label>
-            <input class="form-control" name="book_title" id="edit_book_title">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">ISBN</label>
-            <input class="form-control" name="book_isbn" id="edit_book_isbn">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Publication Year</label>
-            <input class="form-control" type="number" min="1500" max="2100" name="book_publication_year" id="edit_book_year">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Publisher</label>
-            <input class="form-control" name="book_publisher" id="edit_book_publisher">
-          </div>
-          <button name="update_book" class="btn btn-primary w-100" type="submit">Save Changes</button>
-        </form>
-      </div>
+          <input type="hidden" name="book_id" id="delete_book_id">
+          <input type="hidden" name="book_title" id="delete_book_titles">
+
+        <div class="d-flex gap-2 justify-content-end">
+          <button type="button" class ="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+          <button type="submit" class ="btn btn-danger" name="delete_book">Delete</button>
     </div>
   </div>
 </div>
@@ -454,19 +485,36 @@ $bookUpdateMessage = '';
   const editBookModal = document.getElementById('editBookModal');
   editBookModal.addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget;
-    if(!button) return;
+    if (!button) return;
 
-    document.getElementById('edit_book_id').value = button.getAttribute('data-book-id') || '';
+    document.getElementById('edit_book_id').value = btn.getAttribute('data-book-id') || '';
 
-    document.getElementById('edit_book_title').value = button.getAttribute('data-book-title') || '';
+    document.getElementById('edit_book_title').value = btn.getAttribute('data-book-title') || '';
 
-    document.getElementById('edit_book_isbn').value = button.getAttribute('data-book-isbn') || '';
+    document.getElementById('edit_book_isbn').value = btn.getAttribute('data-book-isbn') || '';
 
-    document.getElementById('edit_book_year').value = button.getAttribute('data-book-year') || '';
+    document.getElementById('edit_book_year').value = btn.getAttribute('data-book-year') || '';
     
-    document.getElementById('edit_book_publisher').value = button.getAttribute('data-book-publisher') || '';
+    document.getElementById('edit_book_publisher').value = btn.getAttribute('data-book-publisher') || '';
 
   });
+</script>
+
+<script>
+  const deleteBookModal =  document.getElementById('deleteBookModal')
+  deleteBookModal.addEventListener('show.bs.modal', function(event) {
+
+  const btn = event.relatedTarget;
+  if (!btn) return;
+
+  document.getElementById('delete_book_id').value = btn.getAttribute('data-book-id') || '';
+  
+  document.getElementById('delete_book_titles').value = btn.getAttribute('data-book-title') || '';
+
+  document.getElementById("delete_book_title").textContent = ' ' + (btn.getAttribute
+  ('data-book-title') || '');
+
+ });
 </script>
 
 

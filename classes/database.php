@@ -317,7 +317,38 @@
             } catch (PDOException $e) {
                 return false; 
         }
-    } 
+    }
+
+    function deleteBook($book_id) {
+        $con = $this->opencon();
+     
+        try {
+            $con->beginTransaction();
+     
+            $stmtCopies = $con->prepare("DELETE FROM book_copy WHERE book_id = ?");
+            $stmtCopies->execute([$book_id]);
+
+            $stmtGenre = $con->prepare("DELETE FROM book_genre WHERE book_id = ?");
+            $stmtGenre->execute([$book_id]);
+
+            $stmtBA = $con->prepare("DELETE FROM book_authors WHERE book_id = ?");
+            $stmtBA->execute([$book_id]);
+
+            $stmtBooks = $con->prepare("DELETE FROM books WHERE book_id = ?");
+            $stmtBooks->execute([$book_id]);
+
+            $con->commit();
+            return true; 
+    
+     } catch (PDOException $e) {
+            if ($con->inTransaction()) {
+                $con->rollBack();
+            }
+            throw $e;
+        }
+            }
+
+
 }
 
 ?>
