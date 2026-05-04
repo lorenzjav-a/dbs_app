@@ -18,12 +18,12 @@
     </button>
     <div id="navBorrower" class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto gap-lg-1">
-        <li class="nav-item"><a class="nav-link active" href="borrower-dashboard.html">My Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="catalog.html">Catalog</a></li>
+        <li class="nav-item"><a class="nav-link active" href="borrower-dashboard.php">My Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="catalog.php">Catalog</a></li>
       </ul>
       <div class="d-flex align-items-center gap-2">
         <span class="badge badge-soft">Role: BORROWER</span>
-        <a class="btn btn-sm btn-outline-secondary" href="login.html">Logout</a>
+        <a class="btn btn-sm btn-outline-secondary" href="login.php">Logout</a>
       </div>
     </div>
   </div>

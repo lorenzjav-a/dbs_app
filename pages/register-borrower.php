@@ -12,9 +12,9 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-semibold" href="login.html">Library</a>
+    <a class="navbar-brand fw-semibold" href="login.php">Library</a>
     <div class="ms-auto">
-      <a class="btn btn-sm btn-outline-secondary" href="login.html">Back to Login</a>
+      <a class="btn btn-sm btn-outline-secondary" href="login.php">Back to Login</a>
     </div>
   </div>
 </nav>

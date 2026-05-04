@@ -18,7 +18,7 @@
     </button>
     <div id="navCatalog" class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto gap-lg-1">
-        <li class="nav-item"><a class="nav-link active" href="catalog.html">Catalog</a></li>
+        <li class="nav-item"><a class="nav-link active" href="catalog.php">Catalog</a></li>
         <li class="nav-item"><a class="nav-link" href="admin-dashboard.php">Admin</a></li>
         <li class="nav-item"><a class="nav-link" href="borrower-dashboard.php">Borrower</a></li>
       </ul>

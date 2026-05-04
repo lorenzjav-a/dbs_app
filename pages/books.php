@@ -310,6 +310,13 @@ $bookUpdateMessage = '';
 
             >Edit</button>';
 
+            echo'<button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deleteBookModal"
+
+            data-book-id="'.$book['book_id'].'"
+            data-book-title="'.$book['book_title'].'"
+
+            >Delete</button>';
+
             echo'<button class="btn btn-sm btn-outline-danger">Delete</button>';
             echo'</div>';
             echo'</td>';
