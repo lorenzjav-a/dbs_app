@@ -348,6 +348,29 @@
         }
             }
 
+            function deleteAuthor($author_id) {
+        $con = $this->opencon();
+     
+        try {
+            $con->beginTransaction();
+     
+            $stmtBA = $con->prepare("DELETE FROM book_authors WHERE author_id = ?");
+            $stmtBA->execute([$author_id]);
+
+            $stmtBooks = $con->prepare("DELETE FROM author WHERE author_id = ?");
+            $stmtBooks->execute([$author_id]);
+
+            $con->commit();
+            return true; 
+    
+     } catch (PDOException $e) {
+            if ($con->inTransaction()) {
+                $con->rollBack();
+            }
+            throw $e;
+        }
+            }
+
 
 }
 

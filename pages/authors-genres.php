@@ -1,5 +1,6 @@
 <?php
 require_once('../classes/database.php');
+session_start();
 $con = new database();
 
 $allauthors = $con->viewAuthors();
@@ -60,6 +61,26 @@ if(isset($_POST['add_genre'])){
     }
 }
 
+if(isset($_POST['delete_author'])){
+    $author_id = $_POST['author_id'];
+    $author_name = $_POST['firstname'] . ' ' . $_POST['lastname'];
+    $_SESSION['author_name'] = $author_name;
+
+    try {
+
+    $con->deleteAuthor($author_id);
+    $_SESSION['success_message'] = $author_name . ' has been deleted from the database. ';
+    header('Location: authors-genres.php');
+    exit();
+    
+    } catch (Exception $e){
+
+    $error_message = "Cannot delete this author. It may have active books associated with it.";
+      
+    }
+
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -99,6 +120,28 @@ if(isset($_POST['add_genre'])){
 </nav>
 
 <main class="container py-4">
+
+<?php if(isset($_SESSION['success_message'])){ ?>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Success!</strong> <?php echo $_SESSION['success_message']; ?>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+   
+  </button>
+</div>
+<?php 
+ unset($_SESSION['success_message']);
+} ?>
+
+<?php if(isset($error_message)){ ?>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error</strong> <?php echo $error_message; ?>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+   
+  </button>
+</div>
+<?php } ?>
+
+
   <div class="row g-3">
 
     <div class="col-12 col-lg-6">
@@ -162,19 +205,30 @@ if(isset($_POST['add_genre'])){
                 <th>Last Name</th>
                 <th>Birth Year</th>
                 <th>Nationality</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               
                 <?php
                 foreach ($allauthors as $author) {
-                    echo "<tr>";
+                    echo '<tr>';
                     echo "<td>{$author['author_id']}</td>";
                     echo "<td>{$author['author_firstname']}</td>";
                     echo "<td>{$author['author_lastname']}</td>";
                     echo "<td>{$author['author_birth_year']}</td>";
                     echo "<td>{$author['author_nationality']}</td>";
-                    echo "</tr>";
+                    
+                    echo'<td>';
+                    echo'<button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAuthorModal"
+
+            data-author-id="'.$author['author_id'].'"
+            data-author-name="'.$author['author_firstname'] . ' ' . $author['author_lastname'].'"
+
+            >Delete</button>';
+
+            echo'</td>';
+            echo'</tr>';
                 }
                 ?>
               
@@ -214,6 +268,31 @@ if(isset($_POST['add_genre'])){
     </div>
   </div>
 </main>
+
+<div class="modal fade" id="deleteAuthorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"> 
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Author</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+
+        <p> Are you sure you want to delete <strong id="delete_author_name"></strong>?</p>
+        <p class="text-danger small"> this action cannot be undone.</p>
+
+        <form action="#" method="POST">
+          <input type="hidden" name="author_id" id="delete_author_id">
+          <input type="hidden" name="author_name" id="delete_author_name">
+
+        <div class="d-flex gap-2 justify-content-end">
+          <button type="button" class ="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+          <button type="submit" class ="btn btn-danger" name="delete_author">Delete</button>
+    </div>
+  </div>
+</div>
 
 <script src="../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 <script src="../sweetalert/dist/sweetalert2.js"></script>
@@ -281,6 +360,23 @@ if(isset($_POST['add_genre'])){
 
 
 
+</script>
+
+<script>
+  const deleteAuthorModal =  document.getElementById('deleteAuthorModal')
+  deleteAuthorModal.addEventListener('show.bs.modal', function(event) {
+
+  const btn = event.relatedTarget;
+  if (!btn) return;
+
+  document.getElementById('delete_author_id').value = btn.getAttribute('data-author-id') || '';
+  
+  document.getElementById('delete_author_name').value = btn.getAttribute('data-author-name') || '';
+
+  document.getElementById("delete_author_name").textContent = ' ' + (btn.getAttribute
+  ('data-author-name') || '');
+
+ });
 </script>
 
 
