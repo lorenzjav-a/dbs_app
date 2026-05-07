@@ -357,8 +357,31 @@
             $stmtBA = $con->prepare("DELETE FROM book_authors WHERE author_id = ?");
             $stmtBA->execute([$author_id]);
 
-            $stmtBooks = $con->prepare("DELETE FROM author WHERE author_id = ?");
-            $stmtBooks->execute([$author_id]);
+            $stmtAuthors = $con->prepare("DELETE FROM author WHERE author_id = ?");
+            $stmtAuthors->execute([$author_id]);
+
+            $con->commit();
+            return true; 
+    
+     } catch (PDOException $e) {
+            if ($con->inTransaction()) {
+                $con->rollBack();
+            }
+            throw $e;
+        }
+            }
+
+            function deleteGenre($genre_id) {
+        $con = $this->opencon();
+     
+        try {
+            $con->beginTransaction();
+     
+            $stmtBG = $con->prepare("DELETE FROM book_genre WHERE genre_id = ?");
+            $stmtBG->execute([$genre_id]);
+
+            $stmtGenre = $con->prepare("DELETE FROM genre WHERE genre_id = ?");
+            $stmtGenre->execute([$genre_id]);
 
             $con->commit();
             return true; 
