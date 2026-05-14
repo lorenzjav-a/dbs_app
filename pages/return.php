@@ -15,7 +15,7 @@
     <a class="navbar-brand fw-semibold" href="admin-dashboard.php">Library Admin</a>
     <div class="ms-auto d-flex gap-2">
       <a class="btn btn-sm btn-outline-secondary" href="admin-dashboard.php">Back</a>
-      <a class="btn btn-sm btn-outline-secondary" href="login.html">Logout</a>
+      <a class="btn btn-sm btn-outline-secondary" href="login.php">Logout</a>
     </div>
   </div>
 </nav>
